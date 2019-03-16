@@ -13,8 +13,9 @@ final class ModalNavigationController: UINavigationController {
     var interactor: Interactor!
     
     func handleGesture(sender: UIPanGestureRecognizer) {
-        let percentThreshold: CGFloat = 0.3
-        
+        let percentThreshold: CGFloat = 0.5
+        let velocity = sender.velocity(in: view).y
+        let velocityThreshold: CGFloat = 500.0
         let translation = sender.translation(in: view)
         let verticalMovement = translation.y / view.bounds.height
         let downwardMovement = fmaxf(Float(verticalMovement), 0.0)
@@ -26,7 +27,7 @@ final class ModalNavigationController: UINavigationController {
             interactor.hasStarted = true
             dismiss(animated: true, completion: nil)
         case .changed:
-            interactor.shouldFinish = progress > percentThreshold
+            interactor.shouldFinish = progress > percentThreshold || velocity > velocityThreshold
             interactor.update(progress)
         case .cancelled:
             interactor.hasStarted = false
